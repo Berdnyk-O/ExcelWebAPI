@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ExcelWebAPI.Managers
 {
-    public class DocumentManager
+    public class DocumentManager : IDocumentManager
     {
         private readonly ExcelWebApiContext _context;
 
@@ -14,7 +14,7 @@ namespace ExcelWebAPI.Managers
 
         public async Task<Sheet> CreateSheetAsync(string sheetId)
         {
-            Sheet? newSheet = new()
+            Sheet newSheet = new()
             {
                 Id = sheetId,
                 Cells = new()
@@ -25,40 +25,43 @@ namespace ExcelWebAPI.Managers
 
         public async Task<Cell> CreateCellAsync(string sheetId, string cellId)
         {
-            Cell? newCell = new()
+            Cell newCell = new()
             {
-                Id = sheetId
+                Id = cellId,
+                SheetId = sheetId
             };
             await _context.Cells.AddAsync(newCell);
             return newCell;
         }
 
-        public async Task SetSheetCell(string sheetId, string cellId, string value)
+        public async Task<Cell> SetSheetCellAsync(string sheetId, string cellId, string value)
         {
-            Sheet? sheet = await _context.Sheets.FirstOrDefaultAsync(x => x.Id == sheetId);
-            sheet ??= await CreateSheetAsync(sheetId);
-
-            Cell? cell = await _context.Cells.FirstOrDefaultAsync(x => x.Id == cellId);
-            cell ??= await CreateCellAsync(sheetId, cellId);
+            Sheet sheet = await _context.Sheets.FirstOrDefaultAsync(x => x.Id == sheetId)
+                           ?? await CreateSheetAsync(sheetId);
+                 
+            Cell cell = await _context.Cells.FirstOrDefaultAsync(x => x.Id == cellId)
+                         ?? await CreateCellAsync(sheetId, cellId);
 
             cell.Value = value;
 
             await _context.SaveChangesAsync();
+
+            return cell;
         }
 
-        public Sheet? GetSheet(string sheetName)
+        public async Task<Sheet?> GetSheetAsync(string sheetName)
         {
-            return _context.Sheets.FirstOrDefault(x => x.Id == sheetName) ?? null;
+            return await _context.Sheets.FirstOrDefaultAsync(x => x.Id == sheetName) ?? null;
         }
 
-        public Cell? GetSheetCell(string sheetName, string cellName)
+        public async Task<Cell?> GetSheetCellAsync(string sheetName, string cellName)
         {
-            Sheet? sheet = GetSheet(sheetName);
+            Sheet? sheet = await GetSheetAsync(sheetName);
             if (sheet == null)
             {
                 return null;
             }
-            return sheet.Cells.FirstOrDefault(x => x.Id == cellName) ?? null;
+            return await _context.Cells.FirstOrDefaultAsync(x => x.Id == cellName) ?? null;
         }
     }
 }

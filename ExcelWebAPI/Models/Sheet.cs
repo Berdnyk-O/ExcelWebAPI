@@ -2,7 +2,7 @@
 {
     public class Sheet
     {
-        public string id { get; set; } = null!;
+        public string Id { get; set; } = null!;
         public List<Cell> Cells { get; set; } = new();
     }
 }

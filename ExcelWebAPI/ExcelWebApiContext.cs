@@ -10,6 +10,5 @@ namespace ExcelWebAPI
         public DbSet<Sheet> Sheets { get; set; }
         public ExcelWebApiContext(DbContextOptions<ExcelWebApiContext> options)
         : base(options) { }
-        
     }
 }

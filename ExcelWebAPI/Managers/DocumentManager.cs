@@ -51,7 +51,7 @@ namespace ExcelWebAPI.Managers
 
         public async Task<Sheet?> GetSheetAsync(string sheetName)
         {
-            return await _context.Sheets.FirstOrDefaultAsync(x => x.Id == sheetName) ?? null;
+            return await _context.Sheets.Include(x=>x.Cells).FirstOrDefaultAsync(x => x.Id == sheetName) ?? null;
         }
 
         public async Task<Cell?> GetSheetCellAsync(string sheetName, string cellName)

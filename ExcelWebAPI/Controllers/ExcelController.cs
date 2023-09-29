@@ -1,6 +1,7 @@
 ﻿using ExcelWebAPI.Managers;
 using ExcelWebAPI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace ExcelWebAPI.Controllers
 {
@@ -15,8 +16,24 @@ namespace ExcelWebAPI.Controllers
             _manager = manager;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Get(string sheetId, string sellId)
+        [HttpGet("/{sheetId}")]
+        public async Task<IActionResult> Get([FromRoute] string sheetId)
+        {
+            Sheet? sheet = await _manager.GetSheetAsync(sheetId);
+            if (sheet == null)
+            {
+                return NotFound();
+            }
+            SheetDTO sheetDTO = new();
+            foreach (var cell in sheet.Cells)
+            {
+                sheetDTO.Cells.Add(cell.Id, new(cell.Value));
+            }
+            return Ok(sheetDTO);
+        }
+
+        [HttpGet("/{sheetId}/{sellId}")]
+        public async Task<IActionResult> Get([FromRoute] string sheetId, [FromRoute] string sellId)
         {
             Cell? cell = await _manager.GetSheetCellAsync(sheetId, sellId);
             if (cell == null) 
@@ -27,9 +44,8 @@ namespace ExcelWebAPI.Controllers
             return Ok(cellDTO);
         }
 
-        [HttpPost]
-        [Route("/{sheetId}/{sellId}")]
-        public async Task<IActionResult> Post(string sheetId, string sellId, string value)
+        [HttpPost("/{sheetId}/{sellId}")]
+        public async Task<IActionResult> Post([FromRoute] string sheetId, [FromRoute] string sellId, string value)
         {
             Cell cell =  await _manager.SetSheetCellAsync(sheetId, sellId, value);
             CellDTO cellDTO = new(cell.Value);

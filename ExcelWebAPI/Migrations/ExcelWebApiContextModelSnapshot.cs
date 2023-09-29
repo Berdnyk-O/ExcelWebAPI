@@ -38,10 +38,10 @@ namespace ExcelWebAPI.Migrations
 
             modelBuilder.Entity("ExcelWebAPI.Models.Sheet", b =>
                 {
-                    b.Property<string>("id")
+                    b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
 
                     b.ToTable("Sheets");
                 });

@@ -49,19 +49,29 @@ namespace ExcelWebAPI.Managers
             return cell;
         }
 
-        public async Task<Sheet?> GetSheetAsync(string sheetName)
+        public async Task<Sheet?> GetSheetAsync(string sheetId)
         {
-            return await _context.Sheets.Include(x=>x.Cells).FirstOrDefaultAsync(x => x.Id == sheetName) ?? null;
+            return await _context.Sheets.Include(x=>x.Cells).FirstOrDefaultAsync(x => x.Id == sheetId) ?? null;
         }
 
-        public async Task<Cell?> GetSheetCellAsync(string sheetName, string cellName)
+        public async Task<Cell?> GetSheetCellAsync(string sheetId, string cellId)
         {
-            Sheet? sheet = await GetSheetAsync(sheetName);
+            Sheet? sheet = await GetSheetAsync(sheetId);
             if (sheet == null)
             {
                 return null;
             }
-            return await _context.Cells.FirstOrDefaultAsync(x => x.Id == cellName) ?? null;
+            return await _context.Cells.FirstOrDefaultAsync(x => x.Id == cellId) ?? null;
+        }
+
+        public string GetResult(string cellValue)
+        {
+            if (cellValue[0]!='=')
+            {
+                return cellValue;
+            }
+
+            return "ERROR";
         }
     }
 }

@@ -9,6 +9,6 @@ namespace ExcelWebAPI.Managers
         Task<Sheet?> GetSheetAsync(string sheetName);
         Task<Cell?> GetSheetCellAsync(string sheetName, string cellName);
         Task<Cell> SetSheetCellAsync(string sheetId, string cellId, string value);
-        string GetResult(string cellValue);
+        Task<string> GetResult(string sheetId, string cellValue);
     }
 }

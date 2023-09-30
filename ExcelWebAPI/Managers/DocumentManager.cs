@@ -1,5 +1,6 @@
 ﻿using ExcelWebAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace ExcelWebAPI.Managers
 {
@@ -64,14 +65,128 @@ namespace ExcelWebAPI.Managers
             return await _context.Cells.FirstOrDefaultAsync(x => x.Id == cellId) ?? null;
         }
 
-        public string GetResult(string cellValue)
+        public async Task<string> GetResult(string sheetId,string cellValue)
         {
             if (cellValue[0]!='=')
             {
                 return cellValue;
             }
 
-            return "ERROR";
+            List<string> operators = new();
+            SplitIntoOperators(cellValue,ref operators);
+
+            List<string>? values = new();
+            await GetOperatorsValues(sheetId, values, operators);
+            if (values.Count == 0)
+            {
+                return "ERROR";
+            }
+            if (values.Count == 1)
+            {
+                return values[0];
+            }
+
+            List<char> operations = new();
+            SplitIntoOperations(cellValue,ref operations);
+            List<int> performedOperations = new();
+            string res="";
+            char op=' ';
+            while (operations.Count>0)
+            {
+                int index = 0;
+                if (operations.Contains('*'))
+                {
+                    op = '*';
+                    index = operations.IndexOf(op);
+                }
+                else if (operations.Contains('/'))
+                {
+                    op = '/';
+                    index = operations.IndexOf(op);
+                }
+                else if (operations.Contains('+'))
+                {
+                    op = '+';
+                    index = operations.IndexOf(op);
+                }
+                else if (operations.Contains('-'))
+                {
+                    op = '-';
+                    index = operations.IndexOf(op);
+                }
+                res = Calculate(values[index], values[index + 1], op);
+                operations.RemoveAt(index);
+                values[index] = res;
+                values.RemoveAt(index + 1);
+            }
+            return res;
+        }
+        private void SplitIntoOperators(string cellValue,ref List<string> operators)
+        {
+            operators = cellValue.Split('=', '+', '-', '*', '/').ToList();
+            operators = operators.Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+        }
+        private void SplitIntoOperations(string cellValue,ref List<char> operations)
+        {
+            char[] operators = { '+', '-', '*', '/' };
+
+            foreach (char op in operators)
+            {
+                if (cellValue.Contains(op))
+                {
+                    operations.Add(op);
+                }
+            }
+        }
+        private async Task GetOperatorsValues(string sheetId, List<string> values, List<string> operators)
+        {
+            foreach (var item in operators)
+            {
+                bool variable = false;
+                byte[] asciiBytes = Encoding.ASCII.GetBytes(item);
+                foreach (var item1 in asciiBytes)
+                {
+                    if (item1 > 57)
+                    {
+                        variable = true;
+                        break;
+                    }
+                }
+                if (variable)
+                {
+                    Cell? cell = await GetSheetCellAsync(sheetId, item);
+                    if (cell == null)
+                    {
+                        values = new();
+                        return;
+                    }
+                    values.Add(cell.Value);
+                }
+                else
+                {
+                    values.Add(item);
+                }
+            }
+        }
+        private string Calculate(string val1, string val2, char operation)
+        {
+            if (double.TryParse(val1, out double intFirstValue) && double.TryParse(val2, out double intSecondValue))
+            {
+                switch (operation)
+                {
+                    case '+':
+                        return (intFirstValue + intSecondValue).ToString();
+                    case '-':
+                        return (intFirstValue - intSecondValue).ToString();
+                    case '*':
+                        return (intFirstValue * intSecondValue).ToString();
+                    case '/':
+                        return (intFirstValue / intSecondValue).ToString();
+                    default:
+                        return "Error";
+                } 
+            }
+            return "Error";
         }
     }
 }

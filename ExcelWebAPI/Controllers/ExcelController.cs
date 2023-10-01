@@ -27,7 +27,7 @@ namespace ExcelWebAPI.Controllers
             SheetDTO sheetDTO = new();
             foreach (var cell in sheet.Cells)
             {
-                sheetDTO.Cells.Add(cell.Id, new(cell.Value, await _manager.GetResult(sheetId, cell.Value)));
+                sheetDTO.Cells.Add(cell.Id, new(cell.Value, await _manager.GetResult(sheetId, cell.Id, cell.Value)));
             }
             return Ok(sheetDTO);
         }
@@ -40,7 +40,7 @@ namespace ExcelWebAPI.Controllers
             {
                 return NotFound();
             }
-            CellDTO cellDTO = new(cell.Value, await _manager.GetResult(sheetId, cell.Value));
+            CellDTO cellDTO = new(cell.Value, await _manager.GetResult(sheetId, cell.Id, cell.Value));
             return Ok(cellDTO);
         }
 
@@ -48,13 +48,12 @@ namespace ExcelWebAPI.Controllers
         public async Task<IActionResult> Post([FromRoute] string sheetId, [FromRoute] string sellId, string value)
         {
             Cell cell =  await _manager.SetSheetCellAsync(sheetId, sellId, value);
-            CellDTO cellDTO = new(cell.Value, await _manager.GetResult(sheetId, cell.Value));
+            CellDTO cellDTO = new(cell.Value, await _manager.GetResult(sheetId, cell.Id, cell.Value));
             if(cellDTO.Value=="Error")
             {
-                return StatusCode(StatusCodes.Status201Created, cellDTO);
+                return StatusCode(StatusCodes.Status422UnprocessableEntity, cellDTO);
             }
-            return StatusCode(StatusCodes.Status422UnprocessableEntity, cellDTO);
-
+            return StatusCode(StatusCodes.Status201Created, cellDTO);
         }
     }
 }

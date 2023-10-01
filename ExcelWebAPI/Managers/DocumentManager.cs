@@ -65,7 +65,7 @@ namespace ExcelWebAPI.Managers
             return await _context.Cells.FirstOrDefaultAsync(x => x.Id == cellId) ?? null;
         }
 
-        public async Task<string> GetResult(string sheetId,string cellValue)
+        public async Task<string> GetResult(string sheetId,string cellId, string cellValue)
         {
             if (cellValue[0]!='=')
             {
@@ -74,6 +74,10 @@ namespace ExcelWebAPI.Managers
 
             List<string> operators = new();
             SplitIntoOperators(cellValue,ref operators);
+            if(operators.Contains(cellId))
+            {
+                return "ERROR";
+            }
 
             List<string>? values = new();
             await GetOperatorsValues(sheetId, values, operators);
@@ -88,7 +92,7 @@ namespace ExcelWebAPI.Managers
 
             List<char> operations = new();
             SplitIntoOperations(cellValue,ref operations);
-            List<int> performedOperations = new();
+
             string res="";
             char op=' ';
             while (operations.Count>0)
@@ -130,11 +134,11 @@ namespace ExcelWebAPI.Managers
         {
             char[] operators = { '+', '-', '*', '/' };
 
-            foreach (char op in operators)
+            foreach (char c in cellValue)
             {
-                if (cellValue.Contains(op))
+                if (Array.IndexOf(operators, c) != -1)
                 {
-                    operations.Add(op);
+                    operations.Add(c);
                 }
             }
         }
@@ -160,7 +164,8 @@ namespace ExcelWebAPI.Managers
                         values = new();
                         return;
                     }
-                    values.Add(cell.Value);
+                    string value = await GetResult(sheetId, cell.Id, cell.Value);
+                    values.Add(value);
                 }
                 else
                 {

@@ -23,12 +23,12 @@ namespace ExcelWebAPI.Controllers
         {
             sheetId = sheetId.Trim();
 
-            if (sheetId.Any(Char.IsWhiteSpace))
+            sheetId = sheetId.ToLower();
+
+            if (!IsIdValid(sheetId))
             {
                 return BadRequest();
             }
-
-            sheetId = sheetId.ToLower();
 
             Sheet? sheet = await _manager.GetSheetAsync(sheetId);
             if (sheet == null)
@@ -51,13 +51,13 @@ namespace ExcelWebAPI.Controllers
             sheetId = sheetId.Trim();
             sellId = sellId.Trim();
 
-            if (sheetId.Any(Char.IsWhiteSpace) || sellId.Any(Char.IsWhiteSpace))
+            sheetId = sheetId.ToLower();
+            sellId = sellId.ToLower();
+
+            if (!IsIdValid(sheetId) || !IsIdValid(sellId))
             {
                 return BadRequest();
             }
-
-            sheetId = sheetId.ToLower();
-            sellId = sellId.ToLower();
 
             Cell? cell = await _manager.GetSheetCellAsync(sheetId, sellId);
             if (cell == null) 
@@ -75,13 +75,13 @@ namespace ExcelWebAPI.Controllers
             sheetId = sheetId.Trim();
             sellId = sellId.Trim();
 
-            if (sheetId.Any(Char.IsWhiteSpace) || sellId.Any(Char.IsWhiteSpace)) 
+            sheetId = sheetId.ToLower();
+            sellId = sellId.ToLower();
+
+            if (!IsIdValid(sheetId) || !IsIdValid(sellId)) 
             {
                 return BadRequest();
             }
-
-            sheetId = sheetId.ToLower();
-            sellId =sellId.ToLower();
 
             Cell cell =  await _manager.SetSheetCellAsync(sheetId, sellId, value);
            
@@ -92,6 +92,17 @@ namespace ExcelWebAPI.Controllers
             }
 
             return StatusCode(StatusCodes.Status201Created, cellDTO);
+        }
+
+        private bool IsIdValid(string id)
+        {
+            string specialChar = @" \|!#$%&/()=?»«@₴~{}.;'<>,^";
+            foreach (var item in specialChar)
+            {
+                if (id.Contains(item)) return false;
+            }
+            double result;
+            return !Double.TryParse(id, out result);
         }
     }
 }

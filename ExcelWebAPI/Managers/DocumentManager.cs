@@ -102,7 +102,6 @@ namespace ExcelWebAPI.Managers
                 return "ERROR";
             }
 
-
             List<string> operators = new();
             SplitIntoOperators(cellValue, ref operators);
             if (operators.Contains(cellId))
@@ -228,22 +227,6 @@ namespace ExcelWebAPI.Managers
             }
             return "Error";
         }
-        private void GetIddexesOfBreckets(List<int> openBrackets, List<int> closeBrackets, string cellValue)
-        {
-            for (int i = 0; i < cellValue.Length; i++)
-            {
-                char currentChar = cellValue[i];
 
-                if (currentChar == '(')
-                {
-                    openBrackets.Add(i);
-                }
-                else if (currentChar == ')')
-                {
-                    closeBrackets.Add(i);
-                }
-            }
-
-        }
     }
 }

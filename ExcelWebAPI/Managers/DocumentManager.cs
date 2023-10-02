@@ -37,11 +37,11 @@ namespace ExcelWebAPI.Managers
 
         public async Task<Cell> SetSheetCellAsync(string sheetId, string cellId, string value)
         {
-            Sheet sheet = await _context.Sheets.FirstOrDefaultAsync(x => x.Id == sheetId)
+            Sheet sheet = await GetSheetAsync(sheetId)
                            ?? await CreateSheetAsync(sheetId);
                  
-            Cell cell = await _context.Cells.FirstOrDefaultAsync(x => x.Id == cellId)
-                         ?? await CreateCellAsync(sheetId, cellId);
+            Cell cell = await GetSheetCellAsync(sheet.Id, cellId)
+                         ?? await CreateCellAsync(sheet.Id, cellId);
 
             cell.Value = value;
 

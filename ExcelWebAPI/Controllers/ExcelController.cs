@@ -8,7 +8,6 @@ using System.Xml.Linq;
 namespace ExcelWebAPI.Controllers
 {
     [ApiController]
-    [Route("api/v1")]
     public class ExcelController : ControllerBase
     {
         private readonly IDocumentManager _manager;
@@ -18,7 +17,7 @@ namespace ExcelWebAPI.Controllers
             _manager = manager;
         }
 
-        [HttpGet("/{sheetId}")]
+        [HttpGet("api/v1/{sheetId}")]
         public async Task<IActionResult> Get([FromRoute] string sheetId)
         {
             sheetId = sheetId.Trim();
@@ -45,7 +44,7 @@ namespace ExcelWebAPI.Controllers
             return Ok(sheetDTO);
         }
 
-        [HttpGet("/{sheetId}/{sellId}")]
+        [HttpGet("api/v1/{sheetId}/{sellId}")]
         public async Task<IActionResult> Get([FromRoute] string sheetId, [FromRoute] string sellId)
         {
             sheetId = sheetId.Trim();
@@ -69,7 +68,7 @@ namespace ExcelWebAPI.Controllers
             return Ok(cellDTO);
         }
 
-        [HttpPost("/{sheetId}/{sellId}")]
+        [HttpPost("api/v1/{sheetId}/{sellId}")]
         public async Task<IActionResult> Post([FromRoute] string sheetId, [FromRoute] string sellId, string value)
         {
             sheetId = sheetId.Trim();

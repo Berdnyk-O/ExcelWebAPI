@@ -81,15 +81,14 @@ namespace ExcelWebAPI.Controllers
             {
                 return BadRequest();
             }
-
-            Cell cell =  await _manager.SetSheetCellAsync(sheetId, sellId, value);
            
-            CellDTO cellDTO = new(cell.Value, await _manager.GetResult(sheetId, cell.Id, cell.Value));
-            if(cellDTO.Value=="Error")
+            CellDTO cellDTO = new(value, await _manager.GetResult(sheetId, sellId, value));
+            if(cellDTO.Result=="ERROR")
             {
                 return StatusCode(StatusCodes.Status422UnprocessableEntity, cellDTO);
             }
 
+            await _manager.SetSheetCellAsync(sheetId, sellId, value);
             return StatusCode(StatusCodes.Status201Created, cellDTO);
         }
 

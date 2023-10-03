@@ -31,14 +31,14 @@ namespace ExcelWebAPI.Controllers
             {
                 return NotFound();
             }
-
-            SheetDTO sheetDTO = new();
+                
+            Dictionary<string, CellDTO> Cells = new();
             foreach (var cell in sheet.Cells)
             {
-                sheetDTO.Cells.Add(cell.Id, new(cell.Value, await _manager.GetResult(sheetId, cell.Id, cell.Value)));
+                Cells.Add(cell.Id, new(cell.Value, await _manager.GetResult(sheetId, cell.Id, cell.Value)));
             }
 
-            return Ok(sheetDTO);
+            return Ok(Cells);
         }
 
         [HttpGet("api/v1/{sheetId}/{sellId}")]

@@ -1,9 +1,6 @@
 ﻿using ExcelWebAPI.Managers;
 using ExcelWebAPI.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
-using System;
-using System.Xml.Linq;
 
 namespace ExcelWebAPI.Controllers
 {
@@ -94,13 +91,12 @@ namespace ExcelWebAPI.Controllers
 
         private bool IsIdValid(string id)
         {
-            string specialChar = @" \|!#$%&/()=?»«@₴~{}.;'<>,^";
-            foreach (var item in specialChar)
+            string specialChars = @" \|!#$%&/()=?»«@₴~{}.;'<>,^";
+            foreach (var specialChar in specialChars)
             {
-                if (id.Contains(item)) return false;
+                if (id.Contains(specialChar)) return false;
             }
-            double result;
-            return !Double.TryParse(id, out result);
+            return !double.TryParse(id, out double result);
         }
     }
 }

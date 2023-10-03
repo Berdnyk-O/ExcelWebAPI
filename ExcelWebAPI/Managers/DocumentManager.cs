@@ -129,15 +129,19 @@ namespace ExcelWebAPI.Managers
             while (operations.Count > 0)
             {
                 int index = 0;
-                if (operations.Contains('*'))
+                if (operations.Contains('*') && operations.Contains('/'))
                 {
-                    op = '*';
-                    index = operations.IndexOf(op);
+                    var multiplicationIndex = operations.IndexOf('*');
+                    var divisionIndex = operations.IndexOf('/');
+
+                    index = multiplicationIndex < divisionIndex ? multiplicationIndex : divisionIndex;
+                    op = multiplicationIndex < divisionIndex ? '*' : '/';
                 }
-                else if (operations.Contains('/'))
+                else if (operations.Contains('*') || operations.Contains('/'))
                 {
-                    op = '/';
-                    index = operations.IndexOf(op);
+                    var multiplicationIndex = operations.IndexOf('*'); 
+                    index = multiplicationIndex == -1 ? operations.IndexOf('/') : multiplicationIndex;
+                    op = multiplicationIndex == -1 ? '/' : '*';
                 }
                 else if (operations.Contains('+'))
                 {

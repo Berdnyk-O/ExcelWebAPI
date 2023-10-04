@@ -21,7 +21,7 @@ If the user specifies an invalid cellId or sheetId, they receive a response with
 If there is an error in the formula, the user receives a response with the status code 422 Unprocessable Entity.
 The user sees the 404 Not Found status when the get request did not find data by cellId or sheetId.
 
-Data is stored in the SQLlite database.
+Data is stored in the SQLite database.
 
 ## Executing program
 

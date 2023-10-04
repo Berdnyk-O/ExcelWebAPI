@@ -12,6 +12,7 @@ The string type is immutable, no operations can be performed on it. To set a val
 
 Names cellId and sheetId are case insensitive.
 cellId and sheetId cannot include prohibited characters, such as !,?, #, $, etc.
+Extra spaces before or after the id are ignored.
 
 Formulas must begin with '='.
 

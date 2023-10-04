@@ -142,15 +142,19 @@ namespace ExcelWebAPI.Managers
                     index = multiplicationIndex == -1 ? operations.IndexOf('/') : multiplicationIndex;
                     op = multiplicationIndex == -1 ? '/' : '*';
                 }
-                else if (operations.Contains('+'))
+                else if (operations.Contains('+') && operations.Contains('-'))
                 {
-                    op = '+';
-                    index = operations.IndexOf(op);
+                    var additionIdex = operations.IndexOf('+');
+                    var subtractionIndex= operations.IndexOf('-');
+
+                    index = additionIdex < subtractionIndex ? additionIdex : subtractionIndex;
+                    op = additionIdex < subtractionIndex ? '+' : '-';
                 }
-                else if (operations.Contains('-'))
+                else if (operations.Contains('+') || operations.Contains('-'))
                 {
-                    op = '-';
-                    index = operations.IndexOf(op);
+                    var additionIdex = operations.IndexOf('+');
+                    index = additionIdex == -1 ? operations.IndexOf('-') : additionIdex;
+                    op = additionIdex == -1 ? '-' : '+';
                 }
                 res = Calculate(values[index], values[index + 1], op);
                 operations.RemoveAt(index);

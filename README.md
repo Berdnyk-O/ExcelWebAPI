@@ -7,7 +7,8 @@ Backend API for Excel.
 The API has 2 endpoints for receiving data and 1 endpoint for writing.
 
 Supports basic data types: string, integer, float.
-Support basic math operations like +, -, /, * and (). 
+Support basic math operations like +, -, /, * and ().
+The program checks the correct placement and number of parentheses. 
 The string type is immutable, no operations can be performed on it. To set a value of type float, you need to write numbers with a comma separator. Otherwise, the number will be interpreted as a string.
 
 Names cellId and sheetId are case insensitive.
